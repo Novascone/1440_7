@@ -1,0 +1,44 @@
+ _  _  _____      _______ ___   
+| || |/ _ \ \    / /_   _/ _ \  
+| __ | (_) \ \/\/ /  | || (_) | 
+|_||_|\___/ \_/\_/   |_| \___/  get this to work on C9
+
+Install g++ version 7
+---------------------
+$ sudo apt install libcurl4-nss-dev g++-7
+$ sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 10
+
+Then test that `g++ --version` shows the correct version number
+
+
+Install curlpp library
+----------------------
+git clone https://github.com/jpbarrette/curlpp
+cmake -DCMAKE_INSTALL_PREFIX=/usr . && make && sudo make install
+
+
+Clone my starter code
+---------------------
+git clone https://bitbucket.org/erikfalor/Fa17-cs1440-hw7
+cd Fa17-cs1440-hw7
+make
+
+                                
+ _____ ___  ___   ___ _ 
+|_   _/ _ \|   \ / _ (_)
+  | || (_) | |) | (_) | 
+  |_| \___/|___/ \___(_)
+                        
+X Follow 30x redirects
+X Parse out domain name from original URL, so as to be able to follow it on subsequent searches
+X Recurse
+_ Use a hashmap to keep track of already visited URLs so we don't re-visit the same pages
+
+
+ ___             _ 
+|   \ ___  __ __(_)
+| |) / _ \/ _(_-<_ 
+|___/\___/\__/__(_)
+
+https://curl.haxx.se/libcurl/c/curl_easy_setopt.html
+http://www.cplusplus.com/reference/regex/match_results/
