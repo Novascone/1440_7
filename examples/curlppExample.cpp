@@ -57,33 +57,22 @@ int main(int argc, char *argv[]) {
         request.setOpt(follow);
 
 
-
-        // The request is made when we insert the curlpp::Easy object into an output stream
-        std::cout << "The 1st request, sent straight to cout" << std::endl
-            << "======================================" << std::endl;
-
+        std::cout << "Sending the request object to a stringstream" << std::endl
+            << "This performs the HTTP request automatically for us," << std::endl
+            << "no need to call .perform() on the request object!" << std::endl
+            << "====================================================" << std::endl;
         for (int i = 3; i > 0; sleep(1), --i) 
             std::cout << i << "... " << std::flush;
 
-        std::cout << std::endl << request << std::endl;
-
-
-
-        // We can do the same thing with a string stream; any std::ostream object will work!
+        // We create a stringstream object to capture the output of the HTTP response.
+        // Inserting our curlpp::Easy request object into the stream is all we need to
+        // do. That's easy!
         std::ostringstream os;
-        os << curlpp::options::Url(url) << std::endl;
-
-        std::cout << "The 2nd request, which goes to a stringstream" << std::endl
-            << "(it looks the same as the 1st)" << std::endl
-            << "=============================================" << std::endl;
-        for (int i = 3; i > 0; sleep(1), --i) 
-            std::cout << i << "... " << std::flush;
+        os << request << std::endl;
 
         // Let's put this response into a string variable:
         std::string html(os.str());
         std::cout << html << std::endl;
-
-
 
 
         return EXIT_SUCCESS;
