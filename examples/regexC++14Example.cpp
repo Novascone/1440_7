@@ -13,26 +13,25 @@
 #include <regex>
 
 int main () {
-	std::string s("this subject has a submarine as a subsequence\n"
-			"subbing submitting\n"
-			"submission substitute\n"
-			"semper ubi sub ubi subversion"
-			);
+    std::string haystack("this subject has a submarine as a subsequence\n"
+            "subbing. submitting\n"
+            "submission, substitute\n"
+            "semper ubi? sub! ubi subversion"
+            );
 
-	std::string re("\\b(sub)([^ \n\t]*)");   // matches words beginning by "sub"
-	std::regex e(re);
+    std::string regexSourceCode("\\b(sub)([^ \n\t]*)");   // matches words beginning by "sub"
+    std::regex needle(regexSourceCode);
+    std::smatch match;
 
-	std::cout << "Target sequence: " << s << std::endl << std::endl;
-	std::cout << "Regular expression: /\\b(sub)([^ ]*)/" << std::endl << std::endl;
-	std::cout << "The following matches and submatches were found:" << std::endl;
+    std::cout << "Regex source code (the needle):" << regexSourceCode  << std::endl;
+    std::cout << "Target sequence (the haystack): " << haystack << std::endl << std::endl;
+    std::cout << "The following matches and submatches were found:" << std::endl;
 
-	std::smatch m;
-
-	while (std::regex_search (s, m, e)) {
-		for (auto x : m) std::cout << "\t" << x << " ";
-		std::cout << std::endl;
-		s = m.suffix().str();
-	}
-
-	return 0;
+    while (std::regex_search(haystack, match, needle)) {
+        for (auto submatch : match)
+            std::cout << "\t" << submatch << " ";
+        std::cout << std::endl;
+        haystack = match.suffix().str();
+    }
+    std::cout << std::endl;
 }
