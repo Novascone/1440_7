@@ -24,6 +24,11 @@ int main () {
     // good enough for your assignment. Do feel free to improve it, if you wish :D
     //
     std::string hrefRegexSource("<[ \n\t]*a[ \n\t]+.*href=\"(https*://)*([^/]+)*\/*([^\"]+)\"");
+    
+    // Here's an alternative regex with 5 capture groups which you may have better luck using:
+    
+    // https://bitbucket.org/snippets/hhenrichsen/xeerEd
+    //regex href_re("<a .*?href=\"(((https?://)([^/]+)?|/)([^\"#]*))\".*?>"); // Hunter's regex
 
     std::string regexSourceCode("\\b(sub)([^ \n\t]*)");   // matches words beginning by "sub"
     std::regex needle(regexSourceCode);
@@ -34,8 +39,13 @@ int main () {
     std::cout << "The following matches and submatches were found:" << std::endl;
 
     while (std::regex_search(haystack, match, needle)) {
-        for (auto submatch : match)
-            std::cout << "\t" << submatch << " ";
+        int i = 0;
+        for (auto submatch : match) {
+            // This line of code illustrates that you can use the match object as though it's an 
+            // array or a map through the subscript operator []
+            std::cout << "\t[" << i << "] " << match[i] << " ";
+            i++;
+        }
         std::cout << std::endl;
         haystack = match.suffix().str();
     }
