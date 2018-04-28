@@ -2,16 +2,26 @@
 #include <map>
 #include <regex>
 #include <sstream>
+#include <string>
+#include <unistd.h>
+#include <vector>
+#include <set>
 
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
+#include <curlpp/Exception.hpp>
+
+void crawl(std::string, int);
+std::vector<std::string> URLs(std::string);
+std::string HTMLsource(std::string);
 
 
+int main(int argc, char** argv) 
+{
+    std::string there;
 
-int main(int argc, char** argv) {
-    std::string there = "http://www-cs-faculty.stanford.edu/~knuth/faq.html";
-    int maxDepth = 3;
+    int maxDepth = 1;
 
     if (argc > 1)
         there = argv[1];
@@ -19,42 +29,162 @@ int main(int argc, char** argv) {
     if (argc > 2)
         maxDepth = atoi(argv[2]);
 
+    std::cout << "enter url ";
+    std::cin >> there;
+    std::cout << "enter depth 1-3 ";
+
+    do {
+        std::cin >> maxDepth;
+
+    if( maxDepth != 1 && maxDepth != 2 && maxDepth != 3)
+    {
+        std::cout << "enter valid depth " << std::endl;
+    }
+  
+    } while (maxDepth < 1 || 3 < maxDepth);
+
+
     std::cout << "Recursively crawling the web to a depth of " << maxDepth << " links beginning from " << there << std::endl;
 
-    //  _____ ___  ___   ___  
-    // |_   _/ _ \|   \ / _ (_)
-    //   | || (_) | |) | (_) |
-    //   |_| \___/|___/ \___(_)
-    //                        
-    // 0. Define a recursive function that will, given a URL and a maximum
-    //    depth, follow all hyperlinks found until the maximum depth is
-    //    reached. You may define a wrapper function to make calling this
-    //    recursive function from main() easier.
-    //
-    // 1. Your recursive function will create a new curlpp::Easy object each
-    //    time it's called.  it should also clean up after itself.
-    //
-    // 2. Your recursive function needs to account for relative URLs. For
-    //    example, the address of Don Knuth's FAQ page is
-    //    http://www-cs-faculty.stanford.edu/~knuth/faq.html. If you inspect
-    //    the contents of the page with your browser's developer tools
-    //    (Ctrl-Shift-I) or view the source (Ctrl-U), you'll see that many of
-    //    the links therein do not begin with
-    //    http://www-cs-faculty.stanford.edu/.
-    //
-    //    Your recursive function needs to account for this by remembering what
-    //    the current domain name is, and being prepared to prepend that to the
-    //    URL it parses out of any given hyperlink.
-    //
-    // 3. Your recursive function should skip hyperlinks beginning with # -
-    //    they refer to locations on the same page.
-    //
-    // 4. Your recursive function must also keep track of all pages it's
-    //    visited so that it doesn't waste time visiting the same one again and
-    //    again. This is where the std::map comes in handy. Your recursive
-    //    function takes it as an argument, and returns it, possibly modified,
-    //    after each invocation.
+    
 
+    crawl(there, maxDepth);
 
     return 0;
+}
+
+void crawl(std::string url, int depth)
+{
+    int count = depth;
+
+    std::string html;
+    int i = 0;
+
+    std::vector<std::string> links;
+    
+    std::set<std::string> URLseen;
+
+    if(depth == 0 || URLseen.count(url) == 1 )
+    {
+        return;
+    }
+    
+    else 
+    {
+        html = HTMLsource(url);
+
+        links = URLs(html);
+
+    for (auto e : links) 
+    {
+        if (!URLseen.count(links[i])) 
+        {
+    
+            if (links[i] != "") 
+            {
+            int var = depth;
+                    std::string indent = "";
+          
+                if (var == 1)
+                {
+                    indent = "      ";
+                }
+                if(var == 2)
+                {
+                    indent = "  ";
+                }
+                if(var == 3)
+                {
+                     indent = "";
+                }
+                 std::cout<< indent << links[i] << std::endl;
+
+                crawl(links[i], count - 1);
+            }
+        }
+
+        i++;
+    }
+  }
+}
+
+
+std::vector<std::string> URLs(std::string html)
+{
+    std::string haystack(html);
+
+    std::vector<std::string> links;
+
+    std::string hrefRegexSource("<[ \n\t]*a[ \n\t]+.*href=\"(https*://)*([^/]+)*\\/*([^\"]+)\"");
+  
+
+    std::string regexSourceCode("<a .*?href=\"((https?://?[^\"]+)([^\"#]*)?)\".*?>");
+   
+    std::regex needle(regexSourceCode);
+    std::smatch match;
+
+    while (std::regex_search(haystack, match, needle)) 
+    {
+        
+
+        if (match[2] == "")
+        {
+            haystack = match.suffix().str();
+        }
+        else 
+        {
+           
+
+            links.push_back(match[2]);
+
+            haystack = match.suffix().str();
+        }
+    }
+
+    return links;
+}
+
+
+std::string HTMLsource(std::string there) 
+{
+   
+
+    std:: string str(there);
+
+    str = there;
+
+    try 
+    {
+        curlpp::Cleanup cleaner;
+
+        curlpp::Easy request;
+
+        curlpp::options::Url curlUrl(str);
+
+        request.setOpt(curlUrl);
+
+        curlpp::options::FollowLocation follow(true);
+        request.setOpt(follow);
+
+        std::ostringstream os;
+        os << request << std::endl;
+
+        std::string html(os.str());
+    
+
+        return html;
+        
+    }
+    catch ( curlpp::LogicError & e ) 
+    {
+      
+        return "";
+    }
+    catch ( curlpp::RuntimeError & e )
+    {
+      
+        return "";
+    }
+
+
 }
